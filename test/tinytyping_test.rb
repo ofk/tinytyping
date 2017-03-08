@@ -1,5 +1,17 @@
 require 'test_helper'
 
+class T < TinyTyping::Base
+  typed_attr_accessor value: String
+
+  def initialize(t)
+    test! t, String
+  end
+
+  typed_def :succ, Integer do |t|
+    t + 1
+  end
+end
+
 class TinyTypingTest < Minitest::Test
   def test_that_it_has_a_version_number
     refute_nil ::TinyTyping::VERSION
@@ -29,5 +41,16 @@ class TinyTypingTest < Minitest::Test
     assert TinyTyping.test?({ k: 1 }, k: Numeric)
     refute TinyTyping.test?({ k: 1 }, k: Numeric, x: String)
     assert TinyTyping.test?({ k: 1 }, k: Numeric, 'a' => [String, nil])
+  end
+
+  def test_base_class
+    assert_raises(ArgumentError) { T.new(123) }
+    t = T.new('a')
+    assert t.succ(1) == 2
+    assert_raises(ArgumentError) { t.succ(nil) }
+    t.value = 'a'
+    assert t.value == 'a'
+    assert_raises(ArgumentError) { t.value = 123 }
+    assert t.value == 'a'
   end
 end
