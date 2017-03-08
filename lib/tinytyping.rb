@@ -1,4 +1,4 @@
-require "tinytyping/version"
+require 'tinytyping/version'
 
 module Tinytyping
   # Your code goes here...
