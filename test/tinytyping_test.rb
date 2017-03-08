@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class TinytypingTest < Minitest::Test
+class TinyTypingTest < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::Tinytyping::VERSION
+    refute_nil ::TinyTyping::VERSION
   end
 
   def test_it_does_something_useful

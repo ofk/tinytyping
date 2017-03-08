@@ -5,7 +5,7 @@ require 'tinytyping/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'tinytyping'
-  spec.version       = Tinytyping::VERSION
+  spec.version       = TinyTyping::VERSION
   spec.authors       = ['ofk']
   spec.email         = ['ofkjpn+github@gmail.com']
 

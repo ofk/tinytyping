@@ -1,5 +1,5 @@
 require 'tinytyping/version'
 
-module Tinytyping
+module TinyTyping
   # Your code goes here...
 end
