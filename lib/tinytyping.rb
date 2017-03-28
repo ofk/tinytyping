@@ -9,13 +9,15 @@ module TinyTyping
 
     def test!(value, *types)
       check!(types, value)
+      nil
     end
 
     private
 
     def check!(types, value)
-      return if types.any? { |type| check?(type, value) }
-      raise ArgumentError, "#{value.inspect} isn't #{types.map(&:inspect).join(' or ')}."
+      index = types.index { |type| check?(type, value) }
+      raise ArgumentError, "#{value.inspect} isn't #{types.map(&:inspect).join(' or ')}." unless index
+      types[index]
     end
 
     def check?(type, value)
@@ -30,7 +32,20 @@ module TinyTyping
         true
       when Hash
         return false unless value.is_a?(Hash)
-        type.each { |key, val| check!(Array.try_convert(val) || [val], value[key]) }
+        class_key_types = []
+        named_key_types = []
+        type.each_key do |key|
+          if [Class, Array, Hash].any? { |klass| key.is_a?(klass) }
+            class_key_types << key
+          else
+            named_key_types << key
+          end
+        end
+        (value.keys + named_key_types).uniq.each do |key|
+          ktype = type.include?(key) ? key : check!(class_key_types, key)
+          vtype = type[ktype]
+          check!(Array.try_convert(vtype) || [vtype], value[key])
+        end
         true
       else
         raise TypeError, "no implicit conversion of #{type.class} into Class"

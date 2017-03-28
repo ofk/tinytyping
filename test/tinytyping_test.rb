@@ -26,6 +26,7 @@ class TinyTypingTest < Minitest::Test
     assert_raises(ArgumentError) { TinyTyping.test!(['a'], [Numeric]) }
     assert_nil TinyTyping.test!([123, 456, '7'], [Numeric, String])
     assert_nil TinyTyping.test!({ k: 1 }, k: Numeric)
+    assert_nil TinyTyping.test!({ k: 1 }, Symbol => Numeric)
     assert_raises(ArgumentError) { TinyTyping.test!({ k: 1 }, k: Numeric, x: String) }
     assert_nil TinyTyping.test!({ k: 1 }, k: Numeric, 'a' => [String, nil])
   end
@@ -39,6 +40,7 @@ class TinyTypingTest < Minitest::Test
     refute TinyTyping.test?(['a'], [Numeric])
     assert TinyTyping.test?([123, 456, '7'], [Numeric, String])
     assert TinyTyping.test?({ k: 1 }, k: Numeric)
+    assert TinyTyping.test?({ k: 1 }, Symbol => Numeric)
     refute TinyTyping.test?({ k: 1 }, k: Numeric, x: String)
     assert TinyTyping.test?({ k: 1 }, k: Numeric, 'a' => [String, nil])
   end
