@@ -1,6 +1,14 @@
 require 'test_helper'
 
-class T < TinyTyping::Base
+class TestInclude
+  include TinyTyping
+
+  def initialize(t)
+    test! t, String
+  end
+end
+
+class TestExtends < TinyTyping::Base
   typed_attr_accessor value: String
 
   def initialize(t)
@@ -45,9 +53,15 @@ class TinyTypingTest < Minitest::Test
     assert TinyTyping.test?({ k: 1 }, k: Numeric, 'a' => [String, nil])
   end
 
-  def test_base_class
-    assert_raises(ArgumentError) { T.new(123) }
-    t = T.new('a')
+  def test_include
+    assert_raises(ArgumentError) { TestInclude.new(123) }
+    assert TestInclude.new('a')
+  end
+
+  def test_extends
+    assert_raises(ArgumentError) { TestExtends.new(123) }
+    t = TestExtends.new('a')
+    assert t
     assert t.succ(1) == 2
     assert_raises(ArgumentError) { t.succ(nil) }
     t.value = 'a'

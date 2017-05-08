@@ -53,7 +53,14 @@ module TinyTyping
     end
   end
 
+  def test!(*args)
+    TinyTyping.test!(*args)
+  end
+
   class Base
+    include TinyTyping
+    private :test!
+
     class << self
       private
 
@@ -78,12 +85,6 @@ module TinyTyping
         attr_reader(*pairs.keys)
         typed_attr_writer(pairs)
       end
-    end
-
-    private
-
-    def test!(*args)
-      TinyTyping.test!(*args)
     end
   end
 end
