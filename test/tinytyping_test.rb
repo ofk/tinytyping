@@ -46,6 +46,9 @@ class TinyTypingTest < Minitest::Test
     assert_raises(ArgumentError) { TinyTyping.test!({ k1: 1, 'k2' => '2' }, k1: Numeric, 'k2' => Numeric) }
     assert_raises(ArgumentError) { TinyTyping.test!({ k1: 1, 'k2' => '2' }, k1: Numeric, 'k2' => String, x: String) }
     assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, Symbol => Numeric, String => String)
+    assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, [Symbol, String] => [Numeric, String])
+    assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, [Symbol, String] => String, k1: Numeric)
+    assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, [Symbol, String] => [Numeric, String], x: [String, nil])
 
     assert_nil TinyTyping.test!([ { k1: [ { k2: 'v3' } ] } ], [ k1: [ [ k2: String ] ] ])
     assert_nil TinyTyping.test!({ k1: [ { k2: [ 'v3' ] } ] }, k1: [ [ k2: [ [ String ] ] ] ])

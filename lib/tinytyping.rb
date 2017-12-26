@@ -1,12 +1,6 @@
 module TinyTyping
   class Tester
     class << self
-      def expect(types, value)
-        index = types.index { |type| expect_shape(type, value) }
-        raise ArgumentError, "#{value.inspect} isn't #{types.map(&:inspect).join(' or ')}." unless index
-        types[index]
-      end
-
       def expect_shape(type, value)
         case type
         when Class
@@ -22,20 +16,37 @@ module TinyTyping
           class_key_types = []
           named_key_types = []
           type.each_key do |key|
-            if [Class, Array, Hash].any? { |klass| key.is_a?(klass) }
+            case key
+            when Class, Array
               class_key_types << key
             else
               named_key_types << key
             end
           end
           (value.keys + named_key_types).uniq.each do |key|
-            ktype = type.include?(key) ? key : expect(class_key_types, key)
-            vtype = type[ktype]
-            expect(Array.try_convert(vtype) || [vtype], value[key])
+            expect(class_key_types.flatten(1), key) unless type.include?(key)
+            ktypes = []
+            ktypes << key if named_key_types.include?(key)
+            if value.include?(key)
+              class_key_types.each do |t|
+                if t.is_a?(Array)
+                  ktypes << t if t.index { |t2| expect_shape(t2, key) }
+                else
+                  ktypes << t if expect_shape(t, key)
+                end
+              end
+            end
+            expect(ktypes.map { |k| type[k] }.flatten(1), value[key])
           end
           true
         else
           raise TypeError, "no implicit conversion of #{type.class} into Class"
+        end
+      end
+
+      def expect(types, value)
+        unless types.any? { |type| expect_shape(type, value) }
+          raise ArgumentError, "#{value.inspect} isn't #{types.map(&:inspect).join(' or ')}."
         end
       end
     end
