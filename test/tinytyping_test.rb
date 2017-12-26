@@ -21,36 +21,39 @@ class TestExtends < TinyTyping::Base
 end
 
 class TinyTypingTest < Minitest::Test
-  def test_that_it_has_a_version_number
-    refute_nil ::TinyTyping::VERSION
+  def test_version
+    refute_nil TinyTyping::VERSION
   end
 
   def test_test!
     assert_nil TinyTyping.test!('a', String)
     assert_raises(ArgumentError) { TinyTyping.test!(123, String) }
-    assert_nil TinyTyping.test!(nil, String, nil)
+    assert_nil TinyTyping.test!(nil, nil)
+    assert_nil TinyTyping.test!(nil, NilClass)
+    assert_nil TinyTyping.test!(true, true)
+    assert_nil TinyTyping.test!(true, TrueClass)
+
+    assert_nil TinyTyping.test!(123, String, Numeric)
+
     assert_nil TinyTyping.test!([123], Array)
     assert_nil TinyTyping.test!([123], [Numeric])
     assert_raises(ArgumentError) { TinyTyping.test!(['a'], [Numeric]) }
     assert_nil TinyTyping.test!([123, 456, '7'], [Numeric, String])
-    assert_nil TinyTyping.test!({ k: 1 }, k: Numeric)
-    assert_nil TinyTyping.test!({ k: 1 }, Symbol => Numeric)
-    assert_raises(ArgumentError) { TinyTyping.test!({ k: 1 }, k: Numeric, x: String) }
-    assert_nil TinyTyping.test!({ k: 1 }, k: Numeric, 'a' => [String, nil])
+
+    assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, Hash)
+    assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, k1: Numeric, 'k2' => String)
+    assert_raises(ArgumentError) { TinyTyping.test!({ k1: 1, 'k2' => '2' }, k1: Numeric) }
+    assert_raises(ArgumentError) { TinyTyping.test!({ k1: 1, 'k2' => '2' }, k1: Numeric, 'k2' => Numeric) }
+    assert_raises(ArgumentError) { TinyTyping.test!({ k1: 1, 'k2' => '2' }, k1: Numeric, 'k2' => String, x: String) }
+    assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, Symbol => Numeric, String => String)
+
+    assert_nil TinyTyping.test!([ { k1: [ { k2: 'v3' } ] } ], [ k1: [ [ k2: String ] ] ])
+    assert_nil TinyTyping.test!({ k1: [ { k2: [ 'v3' ] } ] }, k1: [ [ k2: [ [ String ] ] ] ])
   end
 
   def test_test?
     assert TinyTyping.test?('a', String)
     refute TinyTyping.test?(123, String)
-    assert TinyTyping.test?(nil, String, nil)
-    assert TinyTyping.test?([123], Array)
-    assert TinyTyping.test?([123], [Numeric])
-    refute TinyTyping.test?(['a'], [Numeric])
-    assert TinyTyping.test?([123, 456, '7'], [Numeric, String])
-    assert TinyTyping.test?({ k: 1 }, k: Numeric)
-    assert TinyTyping.test?({ k: 1 }, Symbol => Numeric)
-    refute TinyTyping.test?({ k: 1 }, k: Numeric, x: String)
-    assert TinyTyping.test?({ k: 1 }, k: Numeric, 'a' => [String, nil])
   end
 
   def test_include
