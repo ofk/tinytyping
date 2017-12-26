@@ -28,7 +28,7 @@ module TinyTyping
             ktypes = []
             ktypes << key if named_key_types.include?(key)
             ktypes.push(*class_key_types.select { |t| expect_any(t, key) }) if value.include?(key)
-            expect(ktypes.map { |k| type[k] }.flatten(1), value[key])
+            expect(ktypes.flat_map { |k| type[k] }, value[key])
           end
           true
         else
@@ -41,9 +41,8 @@ module TinyTyping
       end
 
       def expect(types, value)
-        unless expect_any(types, value)
-          raise ArgumentError, "#{value.inspect} isn't #{(Array.try_convert(types) || [types]).map(&:inspect).join(' or ')}."
-        end
+        return if expect_any(types, value)
+        raise ArgumentError, "#{value.inspect} isn't #{(Array.try_convert(types) || [types]).map(&:inspect).join(' or ')}."
       end
     end
 

@@ -50,8 +50,8 @@ class TinyTypingTest < Minitest::Test
     assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, [Symbol, String] => String, k1: Numeric)
     assert_nil TinyTyping.test!({ k1: 1, 'k2' => '2' }, [Symbol, String] => [Numeric, String], x: [String, nil])
 
-    assert_nil TinyTyping.test!([ { k1: [ { k2: 'v3' } ] } ], [ k1: [ [ k2: String ] ] ])
-    assert_nil TinyTyping.test!({ k1: [ { k2: [ 'v3' ] } ] }, k1: [ [ k2: [ [ String ] ] ] ])
+    assert_nil TinyTyping.test!([{ k1: [{ k2: 'v3' }] }], [k1: [[k2: String]]])
+    assert_nil TinyTyping.test!({ k1: [{ k2: ['v3'] }] }, k1: [[k2: [[String]]]])
   end
 
   def test_test?
