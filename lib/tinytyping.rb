@@ -1,13 +1,13 @@
 module TinyTyping
   class Tester
     class << self
-      def check!(types, value)
-        index = types.index { |type| check?(type, value) }
+      def expect(types, value)
+        index = types.index { |type| expect_shape(type, value) }
         raise ArgumentError, "#{value.inspect} isn't #{types.map(&:inspect).join(' or ')}." unless index
         types[index]
       end
 
-      def check?(type, value)
+      def expect_shape(type, value)
         case type
         when Class
           value.is_a?(type)
@@ -15,7 +15,7 @@ module TinyTyping
           value == type
         when Array
           return false unless value.is_a?(Array)
-          value.each { |val| check!(type, val) }
+          value.each { |val| expect(type, val) }
           true
         when Hash
           return false unless value.is_a?(Hash)
@@ -29,9 +29,9 @@ module TinyTyping
             end
           end
           (value.keys + named_key_types).uniq.each do |key|
-            ktype = type.include?(key) ? key : check!(class_key_types, key)
+            ktype = type.include?(key) ? key : expect(class_key_types, key)
             vtype = type[ktype]
-            check!(Array.try_convert(vtype) || [vtype], value[key])
+            expect(Array.try_convert(vtype) || [vtype], value[key])
           end
           true
         else
@@ -45,7 +45,7 @@ module TinyTyping
     end
 
     def run!(value)
-      self.class.check!(@types, value)
+      self.class.expect(@types, value)
       nil
     end
   end
