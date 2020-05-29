@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TinyTyping
   class Tester
     class << self
@@ -9,10 +11,12 @@ module TinyTyping
           value == type
         when Array
           return false unless value.is_a?(Array)
+
           value.each { |val| expect(type, val) }
           true
         when Hash
           return false unless value.is_a?(Hash)
+
           class_key_types = []
           named_key_types = []
           type.each_key do |key|
@@ -42,6 +46,7 @@ module TinyTyping
 
       def expect(types, value)
         return if expect_any(types, value)
+
         raise ArgumentError, "#{value.inspect} isn't #{(Array.try_convert(types) || [types]).map(&:inspect).join(' or ')}."
       end
     end
@@ -100,6 +105,7 @@ module TinyTyping
 
           def typed_attr_accessor(pairs)
             attr_reader(*pairs.keys)
+
             typed_attr_writer(pairs)
           end
         end
