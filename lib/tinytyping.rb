@@ -86,27 +86,39 @@ module TinyTyping
         class << self
           private
 
-          def typed_def(method, *types, &block)
-            define_method(method) do |*args|
+          def method_added(method)
+            return unless @next_decorator
+
+            unbound_method = instance_method(method)
+
+            if unbound_method.arity == @next_decorator_airty && (@prev_added_method.nil? || method.to_s == "#{@prev_added_method}=")
+              decorator = @next_decorator
+              @next_decorator = @prev_added_method = nil
+              define_method(method) do |*args, &block|
+                decorator.call(unbound_method.bind(self), *args, &block)
+              end
+            elsif unbound_method.arity.zero? && @prev_added_method.nil?
+              @prev_added_method = method
+            else
+              raise ArgumentError, "#{method}.arity(#{unbound_method.arity}) does not match decorator's arity(#{@next_decorator_airty})"
+            end
+          end
+
+          def decorate(airty, &block)
+            @next_decorator_airty = airty
+            @next_decorator = block
+            @prev_added_method = nil
+          end
+
+          def typed(*types)
+            return if types.empty?
+
+            decorate(types.size) do |method, *args, &block|
               types.each_with_index do |type, index|
-                test!(args[index], *(Array.try_convert(type) || [type]))
+                TinyTyping.test!(args[index], *(Array.try_convert(type) || [type]))
               end
-              instance_exec(*args, &block)
+              method.call(*args, &block)
             end
-          end
-
-          def typed_attr_writer(pairs)
-            pairs.each do |key, types|
-              typed_def "#{key}=", types do |value|
-                instance_variable_set("@#{key}", value)
-              end
-            end
-          end
-
-          def typed_attr_accessor(pairs)
-            attr_reader(*pairs.keys)
-
-            typed_attr_writer(pairs)
           end
         end
       end

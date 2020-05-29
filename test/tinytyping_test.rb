@@ -11,14 +11,16 @@ class TestInclude
 end
 
 class TestExtends < TinyTyping::Base
-  typed_attr_accessor value: String
+  typed String
+  attr_accessor :value
 
-  def initialize(t)
-    test! t, String
+  typed String
+  def initialize(_t)
     @v = 1
   end
 
-  typed_def :succ, Integer do |t|
+  typed Integer
+  def succ(t)
     t + @v
   end
 end
