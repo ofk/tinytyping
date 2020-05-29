@@ -15,10 +15,11 @@ class TestExtends < TinyTyping::Base
 
   def initialize(t)
     test! t, String
+    @v = 1
   end
 
   typed_def :succ, Integer do |t|
-    t + 1
+    t + @v
   end
 end
 
